@@ -4,63 +4,39 @@ mod data;
 use barter::{
     EngineEvent,
     engine::{
-        Engine, Processor,
         clock::LiveClock,
         state::{
-            EngineState,
             global::DefaultGlobalData,
             instrument::{
-                data::{DefaultInstrumentMarketData, InstrumentDataState},
                 filter::InstrumentFilter,
             },
-            order::in_flight_recorder::InFlightRequestRecorder,
-            position::PositionManager,
             trading::TradingState,
         },
     },
     logging::init_logging,
     risk::DefaultRiskManager,
-    statistic::{summary::instrument::TearSheetGenerator, time::Daily},
-    strategy::{
-        DefaultStrategy,
-        algo::AlgoStrategy,
-        close_positions::{ClosePositionsStrategy, build_ioc_market_order_to_close_position},
-        on_disconnect::OnDisconnectStrategy,
-        on_trading_disabled::OnTradingDisabled,
-    },
+    statistic::time::Daily,
     system::{
         builder::{AuditMode, EngineFeedMode, SystemArgs, SystemBuilder},
         config::SystemConfig,
     },
 };
 use barter_data::{
-    event::{DataKind, MarketEvent},
     streams::builder::dynamic::indexed::init_indexed_multi_exchange_market_stream,
     subscription::SubKind,
 };
-use barter_execution::{
-    AccountEvent, AccountEventKind,
-    order::{
-        id::{ClientOrderId, StrategyId},
-        request::{OrderRequestCancel, OrderRequestOpen},
-    },
-};
-use barter_instrument::{asset::AssetIndex, exchange::{ExchangeId, ExchangeIndex}, index::IndexedInstruments, instrument, instrument::InstrumentIndex};
+use barter_instrument::index::IndexedInstruments;
 use barter_integration::Terminal;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
-use smol_str::SmolStr;
 use std::{fs::File, io::BufReader, time::Duration};
-use barter::engine::state::order::manager::OrderManager;
 use tracing::debug;
-use crate::data::{MultiStrategy, MultiStrategyCustomInstrumentData, StrategyA};
+use crate::data::{MultiStrategyCustomInstrumentData, StrategyA};
 
 const FILE_PATH_SYSTEM_CONFIG: &str = "config/system_config.json";
 const RISK_FREE_RETURN: Decimal = dec!(0.05);
-
-
 
 
 #[tokio::main]

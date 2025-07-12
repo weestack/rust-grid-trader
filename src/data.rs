@@ -1,4 +1,3 @@
-use std::ops::Add;
 use barter::engine::{Engine, Processor};
 use barter::engine::state::EngineState;
 use barter::engine::state::global::DefaultGlobalData;
@@ -274,7 +273,7 @@ pub struct MultiStrategyCustomInstrumentData {
 struct SharedIndicators {
     moving_average_20: Option<Decimal>,
     moving_average_50: Option<Decimal>,
-    rsi: Option<Decimal>,
+    _rsi: Option<Decimal>,
     volatility: Option<Decimal>,
     price_history: Vec<Decimal>, // Last N prices for calculations
 }
@@ -282,7 +281,7 @@ struct SharedIndicators {
 #[derive(Debug, Clone, Default)]
 struct SharedMetrics {
     total_volume: Decimal,
-    price_momentum: Option<Decimal>,
+    _price_momentum: Option<Decimal>,
     market_trend: MarketTrend,
 }
 
@@ -427,27 +426,5 @@ impl AlgoStrategy for StrategyB {
         }
 
         (std::iter::empty(), std::iter::empty())
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-struct StrategyCoordination {
-    strategy_a_signal: Option<TradingSignal>,
-    strategy_b_signal: Option<TradingSignal>,
-    combined_signal: Option<TradingSignal>,
-    risk_override: bool,
-}
-
-#[derive(Debug, Clone)]
-enum TradingSignal {
-    Buy,
-    Sell,
-    Hold,
-}
-
-impl MultiStrategyCustomInstrumentData {
-    // Method to coordinate between strategies
-    fn coordinate_strategies(&mut self) {
-        println!("Coordinate strategies");
     }
 }
