@@ -1,0 +1,22 @@
+[package]
+name = "trading-suite"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+barter = "0.12.3"
+barter-data = "0.10.2"
+barter-instrument = "0.3.1"
+barter-integration = "0.9.2"
+barter-execution = "0.6.0"
+futures = "0.3.31"
+tracing = "0.1.41"
+tokio = "1.46.1"
+serde_json = "1.0.140"
+rust_decimal = "1.37.2"
+rust_decimal_macros = "1.37.1"
+chrono = "0.4.41"
+uuid = { version = "1.17.0", features = ["v4"] }
+itertools = "0.14.0"
+smol_str = "0.3.2"
+fnv = "1.0.7"
