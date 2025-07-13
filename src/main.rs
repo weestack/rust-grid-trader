@@ -1,5 +1,4 @@
-mod algorithms;
-mod data;
+mod algorithm;
 
 use barter::{
     EngineEvent,
@@ -33,7 +32,8 @@ use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use std::{fs::File, io::BufReader, time::Duration};
 use tracing::debug;
-use crate::data::{MultiStrategyCustomInstrumentData, StrategyA};
+use crate::algorithm::data::AlgorithmData;
+use crate::algorithm::vwap::Vwap;
 
 const FILE_PATH_SYSTEM_CONFIG: &str = "config/system_config.json";
 const RISK_FREE_RETURN: Decimal = dec!(0.05);
@@ -56,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialise MarketData Stream
     let market_stream = init_indexed_multi_exchange_market_stream(
         &instruments,
-        &[SubKind::PublicTrades, SubKind::OrderBooksL1],
+        &[SubKind::PublicTrades, SubKind::OrderBooksL2],
     )
         .await?;
 
@@ -65,11 +65,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         &instruments,
         executions,
         LiveClock,
-        StrategyA,
+        Vwap,
         DefaultRiskManager::default(),
         market_stream,
         DefaultGlobalData::default(),
-        |_| MultiStrategyCustomInstrumentData::init(Utc::now()),
+        |_| AlgorithmData::new(14),
     );
 
     // Build & run System:
