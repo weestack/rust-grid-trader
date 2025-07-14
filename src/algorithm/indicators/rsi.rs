@@ -1,23 +1,23 @@
+
 use std::collections::VecDeque;
 use std::time::Duration;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
-#[allow(dead_code)]
+
 #[derive(Debug, Clone)]
 pub struct RSI {
     period: usize,
-    gains: VecDeque<Decimal>,
-    losses: VecDeque<Decimal>,
+    gains: VecDeque<(Decimal, DateTime<Utc>)>,
+    losses: VecDeque<(Decimal, DateTime<Utc>)>,
     last_price: Option<Decimal>,
     avg_gain: Option<Decimal>,
     avg_loss: Option<Decimal>,
     last_update: Option<DateTime<Utc>>,
-    sample_interval: Duration,
+    window_duration: Duration,
 }
 
 impl RSI {
-    #[allow(dead_code)]
     pub fn new(period: usize) -> Self {
         Self {
             period,
@@ -27,47 +27,52 @@ impl RSI {
             avg_gain: None,
             avg_loss: None,
             last_update: None,
-            sample_interval: Duration::from_secs(5), // 1 minute intervals
+            window_duration: Duration::from_secs(180), // 60 second rolling window
         }
     }
 
-    #[allow(dead_code)]
-    pub fn update_with_time(&mut self, price: Decimal, timestamp: DateTime<Utc>) {
-        // Only update if enough time has passed
-        if let Some(last_update) = self.last_update {
-            if timestamp.signed_duration_since(last_update).to_std().unwrap_or_default() < self.sample_interval {
-                return;
+    fn remove_old_entries(queue: &mut VecDeque<(Decimal, DateTime<Utc>)>, cutoff_time: DateTime<Utc>) {
+        while let Some((_, old_timestamp)) = queue.front() {
+            if *old_timestamp < cutoff_time {
+                queue.pop_front();
+            } else {
+                break;
             }
         }
+    }
 
+    pub fn update_with_time(&mut self, price: Decimal, timestamp: DateTime<Utc>) {
         if let Some(last_price) = self.last_price {
+            if last_price == price {
+                // prevent duplicates
+                return;
+            }
+            
             let change = price - last_price;
 
             if change > dec!(0) {
-                self.gains.push_back(change);
-                self.losses.push_back(dec!(0));
+                self.gains.push_back((change, timestamp));
+                self.losses.push_back((dec!(0), timestamp));
             } else {
-                self.gains.push_back(dec!(0));
-                self.losses.push_back(change.abs());
+                self.gains.push_back((dec!(0), timestamp));
+                self.losses.push_back((change.abs(), timestamp));
             }
 
-            // Keep only the required period
-            if self.gains.len() > self.period {
-                self.gains.pop_front();
-                self.losses.pop_front();
-            }
+            // Remove entries older than 60 seconds
+            let cutoff_time = timestamp - chrono::Duration::from_std(self.window_duration).unwrap_or_default();
+            
+            // keep for the duration of the rolling window, not the period
+            Self::remove_old_entries(&mut self.gains, cutoff_time);
+            Self::remove_old_entries(&mut self.losses, cutoff_time);
 
             // Calculate RSI when we have enough data
-            if self.gains.len() == self.period {
-                let avg_gain = self.gains.iter().sum::<Decimal>() / Decimal::from(self.period);
-                let avg_loss = self.losses.iter().sum::<Decimal>() / Decimal::from(self.period);
+            if self.gains.len() >= self.period {
+                let avg_gain = self.gains.iter().map(|(gain, _)| *gain).sum::<Decimal>() / Decimal::from(self.gains.len());
+                let avg_loss = self.losses.iter().map(|(loss, _)| *loss).sum::<Decimal>() / Decimal::from(self.losses.len());
 
                 self.avg_gain = Some(avg_gain);
                 self.avg_loss = Some(avg_loss);
             }
-        }
-        if self.value().is_some() {
-            println!("price: {} RSI: {:?}", price, self.value());
         }
 
         self.last_price = Some(price);
@@ -89,7 +94,7 @@ impl RSI {
     }
 
     #[allow(dead_code)]
-    pub fn set_sample_interval(&mut self, interval: Duration) {
-        self.sample_interval = interval;
+    pub fn set_window(&mut self, interval: Duration) {
+        self.window_duration = interval;
     }
 }

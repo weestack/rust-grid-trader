@@ -64,7 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         &instruments,
         executions,
         LiveClock,
-        Vwap,
+        Vwap::default(),
         DefaultRiskManager::default(),
         market_stream,
         DefaultGlobalData::default(),
