@@ -51,11 +51,11 @@ impl AlgoStrategy for Vwap {
                     // SELL Signal: Price above VWAP + overbought RSI
                     signal = format!("🔴 SELL Signal - Price above VWAP by {:.2}%", price_deviation);
                 }
-                println!("{:<6}: {:<12.3}, VWAP: {:<12.3}, RSI: {:<6.3} \r\n{signal}",
+                println!("{:<6}: {:<12.3} | VWAP: {:<12.3} | RSI: {:<6.3} \r\n{signal}",
                          instrument_state.instrument.name_exchange.name(),
                          price,
-                         instrument_state.data.rsi.value().unwrap(),
-                         instrument_state.data.vwap.value().unwrap()
+                         instrument_state.data.vwap.value().unwrap(),
+                         instrument_state.data.rsi.value().unwrap()
                 );
             }
         }
