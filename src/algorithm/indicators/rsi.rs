@@ -3,7 +3,7 @@ use std::time::Duration;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
-
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct RSI {
     period: usize,
@@ -17,6 +17,7 @@ pub struct RSI {
 }
 
 impl RSI {
+    #[allow(dead_code)]
     pub fn new(period: usize) -> Self {
         Self {
             period,
@@ -30,6 +31,7 @@ impl RSI {
         }
     }
 
+    #[allow(dead_code)]
     pub fn update_with_time(&mut self, price: Decimal, timestamp: DateTime<Utc>) {
         // Only update if enough time has passed
         if let Some(last_update) = self.last_update {
@@ -86,6 +88,7 @@ impl RSI {
         }
     }
 
+    #[allow(dead_code)]
     pub fn set_sample_interval(&mut self, interval: Duration) {
         self.sample_interval = interval;
     }

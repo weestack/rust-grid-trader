@@ -30,6 +30,7 @@ impl AlgorithmData {
         }
     }
 
+    #[allow(dead_code)]
     pub fn new_with_vwap(rsi_period: usize, vwap_reset_period: Duration) -> Self {
         Self {
             market_data: DefaultInstrumentMarketData::default(),
@@ -118,10 +119,12 @@ impl RSI {
         }
     }
 
+    #[allow(dead_code)]
     pub fn set_sample_interval(&mut self, interval: Duration) {
         self.sample_interval = interval;
     }
-
+    
+    #[allow(dead_code)]
     // Helper method to set common intervals
     pub fn set_minutes_interval(&mut self, minutes: u64) {
         self.sample_interval = Duration::from_secs(minutes * 60);

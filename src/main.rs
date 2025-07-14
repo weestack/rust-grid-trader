@@ -26,7 +26,6 @@ use barter_data::{
 };
 use barter_instrument::index::IndexedInstruments;
 use barter_integration::Terminal;
-use chrono::Utc;
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;

@@ -14,6 +14,7 @@ pub struct VwapIndicator {
     current_vwap: Option<Decimal>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct VwapTrade {
     price: Decimal,
@@ -39,12 +40,12 @@ impl VwapIndicator {
     }
 
     /// Create an hourly VWAP (resets every hour)
-    pub fn hourly() -> Self {
+    pub fn _hourly() -> Self {
         Self::new(Duration::from_secs(60 * 60))
     }
 
     /// Create a session VWAP (resets every 8 hours)
-    pub fn session() -> Self {
+    pub fn _session() -> Self {
         Self::new(Duration::from_secs(8 * 60 * 60))
     }
 
@@ -75,10 +76,12 @@ impl VwapIndicator {
         self.current_vwap
     }
 
+    #[allow(dead_code)]
     pub fn total_volume(&self) -> Decimal {
         self.volume_sum
     }
 
+    #[allow(dead_code)]
     pub fn trade_count(&self) -> usize {
         self.trades.len()
     }
@@ -99,6 +102,7 @@ impl VwapIndicator {
         self.last_reset = Some(timestamp);
     }
 
+    #[allow(dead_code)]
     pub fn set_reset_period(&mut self, period: Duration) {
         self.reset_period = period;
     }
