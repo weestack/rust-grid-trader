@@ -32,22 +32,28 @@ use rust_decimal_macros::dec;
 use std::{fs::File, io::BufReader, time::Duration};
 use tracing::debug;
 use crate::algorithm::data::AlgorithmData;
+use crate::algorithm::grid::Grid;
 use crate::algorithm::vwap::Vwap;
 
 const FILE_PATH_SYSTEM_CONFIG: &str = "config/system_config.json";
 const RISK_FREE_RETURN: Decimal = dec!(0.05);
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialise Tracing
     init_logging();
 
-    // Load SystemConfig
+    let config = load_config()?;
+
+    // Extract USDT wallet size from config BEFORE destructuring
+    let usdt_wallet_size = extract_usdt_wallet_size(&config);
+    println!("📊 USDT Wallet Size: ${:.2}", usdt_wallet_size);
+
+    // Now destructure the config
     let SystemConfig {
         instruments,
         executions,
-    } = load_config()?;
+    } = config;
 
     // Construct IndexedInstruments
     let instruments = IndexedInstruments::new(instruments);
@@ -59,12 +65,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
         .await?;
 
-    // Construct System Args
+    // Construct System Args with dynamic wallet size
     let args = SystemArgs::new(
         &instruments,
         executions,
         LiveClock,
-        Vwap::default(),
+        Grid::with_params(
+            usdt_wallet_size,
+            dec!(0.05),    // 5% bands
+            14,            // TMA period
+            dec!(0.005),   // 0.5% risk
+            dec!(0.01),    // 1% grid spacing
+            15             // 15 grid levels
+        ),
         DefaultRiskManager::default(),
         market_stream,
         DefaultGlobalData::default(),
@@ -106,8 +119,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Enable trading
     system.trading_state(TradingState::Enabled);
 
-    // Let the example run for 5 seconds...
-    tokio::time::sleep(Duration::from_secs(6000)).await;
+    // Let the example run for 10 minutes...
+    tokio::time::sleep(Duration::from_secs(600)).await;
 
     // Before shutting down, CancelOrders and then ClosePositions
     system.cancel_orders(InstrumentFilter::None);
@@ -134,3 +147,29 @@ fn load_config() -> Result<SystemConfig, Box<dyn std::error::Error>> {
     let config = serde_json::from_reader(reader)?;
     Ok(config)
 }
+
+/// Extracts the USDT wallet size from the system configuration
+pub fn extract_usdt_wallet_size(config: &SystemConfig) -> Decimal {
+    // Look through all executions to find USDT balance
+    for execution in &config.executions {
+        match execution {
+            barter::system::config::ExecutionConfig::Mock(mock_config) => {
+                // Search through balances to find USDT
+                for balance in &mock_config.initial_state.balances {
+                    // Convert AssetNameExchange to string and check if it's USDT
+                    let asset_name = balance.asset.name().to_lowercase();
+                    if asset_name == "usdt" {
+                        return balance.balance.total;
+                    }
+                }
+            }
+            // Handle other execution config types if they exist
+            _ => continue,
+        }
+    }
+
+    // Default fallback if USDT not found
+    println!("⚠️  USDT balance not found in config, using default: $10,000");
+    dec!(10000)
+}
+

@@ -114,88 +114,88 @@
           {
             "asset": "usdt",
             "balance": {
-              "total": 50000,
-              "free": 50000
+              "total": 1000,
+              "free": 1000
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "btc",
             "balance": {
-              "total": 0.1,
-              "free": 0.1
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "eth",
             "balance": {
-              "total": 1.0,
-              "free": 1.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "sol",
             "balance": {
-              "total": 10.0,
-              "free": 10.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "bnb",
             "balance": {
-              "total": 2.0,
-              "free": 2.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "link",
             "balance": {
-              "total": 50.0,
-              "free": 50.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "sui",
             "balance": {
-              "total": 100.0,
-              "free": 100.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "uni",
             "balance": {
-              "total": 30.0,
-              "free": 30.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "ltc",
             "balance": {
-              "total": 5.0,
-              "free": 5.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "xlm",
             "balance": {
-              "total": 500.0,
-              "free": 500.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           },
           {
             "asset": "dot",
             "balance": {
-              "total": 20.0,
-              "free": 20.0
+              "total": 0,
+              "free": 0
             },
             "time_exchange": "2025-03-24T21:30:00Z"
           }

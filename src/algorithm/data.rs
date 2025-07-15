@@ -10,12 +10,14 @@ use rust_decimal::Decimal;
 use std::time::Duration;
 use crate::algorithm::indicators::rsi::RSI;
 use crate::algorithm::indicators::VwapIndicator;
+use crate::algorithm::indicators::sma::SMA;
 
 #[derive(Debug, Clone)]
 pub struct AlgorithmData {
     pub market_data: DefaultInstrumentMarketData,
     pub rsi: RSI,
     pub vwap: VwapIndicator,
+    pub sma: SMA,
 }
 
 impl AlgorithmData {
@@ -24,6 +26,16 @@ impl AlgorithmData {
             market_data: DefaultInstrumentMarketData::default(),
             rsi: RSI::new(rsi_period),
             vwap: VwapIndicator::daily(), // Daily VWAP by default
+            sma: SMA::new(14), // Default SMA period of 14
+        }
+    }
+
+    pub fn new_with_periods(rsi_period: usize, sma_period: usize) -> Self {
+        Self {
+            market_data: DefaultInstrumentMarketData::default(),
+            rsi: RSI::new(rsi_period),
+            vwap: VwapIndicator::daily(),
+            sma: SMA::new(sma_period),
         }
     }
 
@@ -33,6 +45,7 @@ impl AlgorithmData {
             market_data: DefaultInstrumentMarketData::default(),
             rsi: RSI::new(rsi_period),
             vwap: VwapIndicator::new(vwap_reset_period),
+            sma: SMA::new(14),
         }
     }
 }
@@ -52,9 +65,10 @@ impl<InstrumentKey> Processor<&MarketEvent<InstrumentKey, DataKind>> for Algorit
         // Process the market data first
         self.market_data.process(event);
 
-        // Update RSI with time-based sampling when we have new price data
+        // Update indicators with new price data
         if let Some(price) = self.market_data.price() {
             self.rsi.update_with_time(price, event.time_received);
+            self.sma.update(price);
         }
 
         // Update VWAP on trade events
